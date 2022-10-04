@@ -1,17 +1,7 @@
-// Thank god for https://stackoverflow.com/questions/29711668/perlin-noise-generation, adapted for 'modern' C++
-
-// Two-dimensional value noise based on Hugo Elias's description:
-//   http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
-
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <array>
+// simple noise algorithm adapted from https://mrl.cs.nyu.edu/~perlin/noise/
 
 #include "noise.h"
 #define SIZE 400
-
-int primeIndex = 0;
 
 int main() {
     std::ofstream img("test.pbm");
@@ -19,11 +9,13 @@ int main() {
     img << SIZE << " " << SIZE << std::endl;
     img << "255" << std::endl;
 
-    NoiseGenerator ng(4, 10, 1, 0.5);
+    NoiseGenerator ng(16, 16, 4, 0.75);
 
     for (int y = 0; y < SIZE; ++y) {
         for (int x = 0; x < SIZE; ++x) {
-            img << ng.getNoiseNorm(x, y) << " ";
+            double dx = x / (double)SIZE;
+            double dy = y / (double)SIZE;
+            img << NoiseGenerator::norm(ng.noise(dx, dy, 0.0)) << " ";
         }
         img << std::endl;
     }
@@ -32,86 +24,88 @@ int main() {
     return 0;
 }
 
-NoiseGenerator::NoiseGenerator() {
-    m_octaves = 7;
-    m_frequency = pow(2, m_octaves);
-    m_amplitude = 1;
-    m_persistence = 0.5;
-}
-
-NoiseGenerator::NoiseGenerator(int octaves, int frequency, int amplitude, double persistence) {
+NoiseGenerator::NoiseGenerator(int seed, int octaves, int frequency, int amplitude, double persistence) {
     m_octaves = octaves;
     m_frequency = frequency;
     m_amplitude = amplitude;
     m_persistence = persistence;
-}
-
-double NoiseGenerator::getNoise(double x, double y) {
-    double total = 0;
-    double frequency = m_frequency;
-    double amplitude = m_amplitude;
-    for (int i = 0; i < m_octaves; ++i) {
-        frequency /= 2;
-        amplitude *= m_persistence;
-        total += interpolatedNoise((primeIndex + i) % maxPrimeIndex,
-                x / frequency, y / frequency) * amplitude;
+    srand(seed);
+    for (int i = 0; i < PERMUTATION_SIZE / 2; ++i) {
+        m_permutation[i] = rand() % 256;
+        m_permutation[256 + i] = m_permutation[i];
     }
-    return total / frequency;
 }
 
-int NoiseGenerator::getNoiseNorm(double x, double y) {
-    return floor(((getNoise(x, y) * 0.5) + 0.5) * 255);
+NoiseGenerator::NoiseGenerator() : NoiseGenerator(time(NULL)) { }
+
+NoiseGenerator::NoiseGenerator(int seed) : NoiseGenerator(seed, 7, pow(2, 7), 1, 0.5) { }
+
+NoiseGenerator::NoiseGenerator(int octaves, int frequency, int amplitude, double persistence)
+    : NoiseGenerator(time(NULL), octaves, frequency, amplitude, persistence) {
+    }
+
+double NoiseGenerator::simpleNoise(double x, double y, double z) {
+    int X = (int)floor(x) & 255;
+    int Y = (int)floor(y) & 255;
+    int Z = (int)floor(z) & 255;
+
+    double fx = x - floor(x);
+    double fy = y - floor(y);
+    double fz = z - floor(z);
+
+    double u = fade(fx);
+    double v = fade(fy);
+    double w = fade(fz);
+
+    int A  = m_permutation[X  ]+Y;
+    int AA = m_permutation[A  ]+Z;
+    int AB = m_permutation[A+1]+Z;
+    int B  = m_permutation[X+1]+Y;
+    int BA = m_permutation[B  ]+Z;
+    int BB = m_permutation[B+1]+Z;
+
+    return lerp(w, lerp(v, lerp(u, grad(m_permutation[AA  ], fx  , fy  , fz   ),
+                                   grad(m_permutation[BA  ], fx-1, fy  , fz   )),
+                           lerp(u, grad(m_permutation[AB  ], fx  , fy-1, fz   ),
+                                   grad(m_permutation[BB  ], fx-1, fy-1, fz   ))),
+                   lerp(v, lerp(u, grad(m_permutation[AA+1], fx  , fy  , fz-1 ),
+                                   grad(m_permutation[BA+1], fx-1, fy  , fz-1 )),
+                           lerp(u, grad(m_permutation[AB+1], fx  , fy-1, fz-1 ),
+                                   grad(m_permutation[BB+1], fx-1, fy-1, fz-1 ))));
 }
 
-std::array<std::array<int, 3>, maxPrimeIndex> NoiseGenerator::m_primes = {
-    std::array<int,3>{ 995615039, 600173719, 701464987 },
-    std::array<int,3>{ 831731269, 162318869, 136250887 },
-    std::array<int,3>{ 174329291, 946737083, 245679977 },
-    std::array<int,3>{ 362489573, 795918041, 350777237 },
-    std::array<int,3>{ 457025711, 880830799, 909678923 },
-    std::array<int,3>{ 787070341, 177340217, 593320781 },
-    std::array<int,3>{ 405493717, 291031019, 391950901 },
-    std::array<int,3>{ 458904767, 676625681, 424452397 },
-    std::array<int,3>{ 531736441, 939683957, 810651871 },
-    std::array<int,3>{ 997169939, 842027887, 423882827 }
-};
+double NoiseGenerator::noise(double x, double y, double z) {
+    int oct = m_octaves;
+    int freq = m_frequency;
+    int amp = m_amplitude;
+    double persistence = m_persistence;
+    double sum = 0.0;
+    double maxValue = 0.0;
+    for (int o = 0; o < oct; ++o) {
+        sum += simpleNoise(x * freq, y * freq, z * freq) * amp;
+        maxValue += amp;
+        amp *= persistence;
+        freq *= 2;
+    }
 
-double NoiseGenerator::noise(int i, int x, int y) {
-    int n = x + y * 57;
-    n = (n << 13) ^ n;
-    int a = m_primes[i][0], b = m_primes[i][1], c = m_primes[i][2];
-    int t = (n * (n * n * a + b) + c) & 0x7fffffff;
-    return 1.0 - (double)(t)/1073741824.0;
+    return sum / maxValue;
 }
 
-double NoiseGenerator::smoothedNoise(int i, int x, int y) {
-    double corners = (noise(i, x-1, y-1) + noise(i, x+1, y-1) +
-            noise(i, x-1, y+1) + noise(i, x+1, y+1)) / 16,
-           sides = (noise(i, x-1, y) + noise(i, x+1, y) + noise(i, x, y-1) +
-                   noise(i, x, y+1)) / 8,
-           center = noise(i, x, y) / 4;
-    return corners + sides + center;
+int NoiseGenerator::norm(double t) {
+    return floor(((t * 0.5) + 0.5) * 255);
 }
 
-double NoiseGenerator::interpolate(double a, double b, double x) {
-    double ft = x * 3.1415927,
-           f = (1 - cos(ft)) * 0.5;
-    return  a*(1-f) + b*f;
+double NoiseGenerator::grad(int hash, double x, double y, double z) {
+    int h = hash & 15;
+    double u = h < 8 ? x : y;
+    double v = h<4 ? y : h == 12 || h == 14 ? x : z;
+    return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
 
-double NoiseGenerator::interpolatedNoise(int i, double x, double y) {
-    int integer_X = x;
-    double fractional_X = x - integer_X;
-    int integer_Y = y;
-    double fractional_Y = y - integer_Y;
-
-    double v1 = smoothedNoise(i, integer_X, integer_Y),
-           v2 = smoothedNoise(i, integer_X + 1, integer_Y),
-           v3 = smoothedNoise(i, integer_X, integer_Y + 1),
-           v4 = smoothedNoise(i, integer_X + 1, integer_Y + 1),
-           i1 = interpolate(v1, v2, fractional_X),
-           i2 = interpolate(v3, v4, fractional_X);
-    return interpolate(i1, i2, fractional_Y);
+double NoiseGenerator::lerp(double t, double a, double b) {
+    return a + t * (b - a);
 }
 
-
+double NoiseGenerator::fade(double t) {
+    return t * t * t * (t * (t * 6 - 15) + 10);
+}

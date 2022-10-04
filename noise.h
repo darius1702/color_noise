@@ -1,28 +1,47 @@
 #ifndef NOISE_H
 #define NOISE_H
 
-#define maxPrimeIndex 10
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <array>
+#include <random>
+#include <time.h>
+
+#define PERMUTATION_SIZE 512
 
 class NoiseGenerator {
     private:
-        static std::array<std::array<int, 3>, maxPrimeIndex> m_primes;
+        // Array used by the Perlin Noise algorithm
+        std::array<int, PERMUTATION_SIZE> m_permutation;
 
+        // Fractal noise parameters
         int m_octaves, m_frequency, m_amplitude;
         double m_persistence;
 
-        double noise(int i, int x, int y);
-        double interpolatedNoise(int i, double x, double y);
-        double smoothedNoise(int i, int x, int y);
-        double interpolate(double a, double b, double x);
+        // Smoothstep fade function
+        static double fade(double t);
+
+        // Linear interpolation
+        static double lerp(double t, double a, double b);
+
+        // Perlin Noise gradient function
+        double grad(int hash, double x, double y, double z);
+
     public:
         NoiseGenerator();
+        NoiseGenerator(int seed);
         NoiseGenerator(int octaves, int frequency, int amplitude, double persistence);
+        NoiseGenerator(int seed, int octaves, int frequency, int amplitude, double persistence);
 
-        // between -1 and 1
-        double getNoise(double x, double y);
+        // Maps noise value in [-1 , 1] to an integer from 0 to 255
+        static int norm(double t);
 
-        // between 0 and 255
-        int getNoiseNorm(double x, double y);
+        // Get fractal noise in [-1, 1]
+        double noise(double x, double y, double z);
+
+        // Get single octave noise in [-1 ,1]
+        double simpleNoise(double x, double y, double z);
 };
 
 #endif // !NOISE_H
