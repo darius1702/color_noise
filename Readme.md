@@ -2,6 +2,8 @@
 
 ## How to run
 ```c++
+#include "noise.h"
+
 // New noise generator with random seed and default parameters
 NoiseGenerator ng;
 
@@ -26,9 +28,9 @@ double n2 = ng.noise(1.0, 1.2, 5.2);
 int color = NoiseGenerator::norm(-0.23);
 ```
 
-```make``` will spit out a 400x400 grayscale noise image in the [Netpbm format](https://en.wikipedia.org/wiki/Netpbm).
+```make && ./main``` will spit out a 400x400 grayscale noise image in the [Netpbm format](https://en.wikipedia.org/wiki/Netpbm).
 
-![example of a generated image](https://github.com/darius1702/color_noise/blob/main/test.png)
+![example of a generated image](https://github.com/darius1702/color_noise/blob/main/example.png)
 ## TODO
 - Color parameters to make the noise look nice
 - Code cleanup
