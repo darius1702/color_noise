@@ -2,6 +2,8 @@
 
 ## How to run
 ```make``` will spit out a little grayscale noise image
+
+![noise](https://github.com/darius1702/color_noise/blob/main/demo.png)
 ## TODO
 - Color parameters to make the noise look nice
 - Code cleanup
