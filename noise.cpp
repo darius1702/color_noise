@@ -2,7 +2,12 @@
 
 #include "noise.h"
 
-NoiseGenerator::NoiseGenerator(int seed, int octaves, int frequency, int amplitude, double persistence) {
+NoiseGenerator::NoiseGenerator(
+        int seed,
+        int octaves,
+        int frequency,
+        int amplitude,
+        double persistence) {
     m_factor = 1;
     m_exponent = 1;
 
@@ -16,14 +21,6 @@ NoiseGenerator::NoiseGenerator(int seed, int octaves, int frequency, int amplitu
         m_permutation[256 + i] = m_permutation[i];
     }
 }
-
-NoiseGenerator::NoiseGenerator() : NoiseGenerator(time(NULL)) { }
-
-NoiseGenerator::NoiseGenerator(int seed) : NoiseGenerator(seed, 7, pow(2, 7), 1, 0.5) { }
-
-NoiseGenerator::NoiseGenerator(int octaves, int frequency, int amplitude, double persistence)
-    : NoiseGenerator(time(NULL), octaves, frequency, amplitude, persistence) {
-    }
 
 double NoiseGenerator::simpleNoise(double x, double y, double z) {
     int X = (int)floor(x) & 255;

@@ -10,7 +10,7 @@
 
 int main() {
 
-    NoiseGenerator ng(24, 2, 2, 0.5);
+    NoiseGenerator ng(time(NULL), 24, 2, 2, 0.5);
     ng.setScaling(2, 1);
 
     FileColorLoader colors(256, "colormap.txt");

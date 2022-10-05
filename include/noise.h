@@ -32,12 +32,12 @@ class NoiseGenerator {
         double grad(int hash, double x, double y, double z);
 
     public:
-        NoiseGenerator();
-        NoiseGenerator(int seed);
-        NoiseGenerator(int octaves, int frequency, int amplitude, double persistence);
-        NoiseGenerator(int seed, int octaves, int frequency, int amplitude, double persistence);
-        // Maps noise value in [-1 , 1] to an integer from 0 to 255
-        static int norm(double t);
+        NoiseGenerator(
+                int seed,
+                int octaves,
+                int frequency,
+                int amplitude,
+                double persistence);
 
         // Get fractal noise in [-1, 1]
         double noise(double x, double y, double z);
