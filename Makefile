@@ -1,12 +1,12 @@
 CPP = g++
-CXXFLAGS = -std=c++14 -Wall -Werror -Wextra
+CXXFLAGS = -std=c++14 -I./include -Wall -Werror -Wextra
 
-OBJECTS = main.o noise.o
+OBJECTS = main.o noise.o colors.o
 
 main: $(OBJECTS)
 	$(CPP) $(CXXFLAGS) -o $@ $^
 
-$(OBJECTS): noise.h
+$(OBJECTS): ./include/*
 
 .PHONY: clean
 

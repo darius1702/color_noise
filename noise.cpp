@@ -3,6 +3,9 @@
 #include "noise.h"
 
 NoiseGenerator::NoiseGenerator(int seed, int octaves, int frequency, int amplitude, double persistence) {
+    m_factor = 1;
+    m_exponent = 1;
+
     m_octaves = octaves;
     m_frequency = frequency;
     m_amplitude = amplitude;
@@ -66,11 +69,24 @@ double NoiseGenerator::noise(double x, double y, double z) {
         freq *= 2;
     }
 
-    return sum / maxValue;
+    double value =  sum / maxValue;
+    double scaled = value * m_factor;
+
+    if (scaled < -1) {
+        scaled = -1;
+    } else if (scaled > 1) {
+        scaled = 1;
+    }
+
+    return pow(scaled, m_exponent);
 }
 
-int NoiseGenerator::norm(double t) {
-    return floor(((t * 0.5) + 0.5) * 255);
+void NoiseGenerator::setScaling(int factor, int exponent) {
+    if (factor < 0  || exponent < 0) {
+         throw std::invalid_argument("invalid noise factor/exponent: " + std::to_string(factor) + " / " + std::to_string(exponent));
+    }
+    m_factor = factor;
+    m_exponent = exponent;
 }
 
 double NoiseGenerator::grad(int hash, double x, double y, double z) {

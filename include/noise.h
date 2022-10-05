@@ -19,6 +19,9 @@ class NoiseGenerator {
         int m_octaves, m_frequency, m_amplitude;
         double m_persistence;
 
+        // Scaling parameters
+        int m_factor, m_exponent;
+
         // Smoothstep fade function
         static double fade(double t);
 
@@ -33,7 +36,6 @@ class NoiseGenerator {
         NoiseGenerator(int seed);
         NoiseGenerator(int octaves, int frequency, int amplitude, double persistence);
         NoiseGenerator(int seed, int octaves, int frequency, int amplitude, double persistence);
-
         // Maps noise value in [-1 , 1] to an integer from 0 to 255
         static int norm(double t);
 
@@ -42,6 +44,9 @@ class NoiseGenerator {
 
         // Get single octave noise in [-1 ,1]
         double simpleNoise(double x, double y, double z);
+
+        // Set scaling factor end exponent for noise values
+        void setScaling(int factor, int exponent);
 };
 
 #endif // !NOISE_H
