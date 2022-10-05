@@ -7,23 +7,27 @@
 #include <string>
 #include <exception>
 
+struct Color {
+    int r, g, b;
+};
+
 class ColorLoader {
 
     protected:
         int m_num_colors;
 
-        std::vector<std::string> m_colormap;
+        std::vector<Color> m_colormap;
 
     public:
         ColorLoader(int num_colors) : m_num_colors (num_colors) {}
 
-        virtual std::string getColorRGB(int index) = 0;
+        virtual Color getColorRGB(int index) = 0;
 };
 
 class FileColorLoader: public ColorLoader {
     public:
         FileColorLoader(int num_colors, std::string filename);
-        std::string getColorRGB(int index) override;
+        Color getColorRGB(int index) override;
 };
 
 #endif // !COLORS_H

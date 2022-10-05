@@ -3,6 +3,7 @@
 ## How to run
 ```c++
 #include "noise.h"
+#include "color.h"
 
 // Seed 123, 6 octaves, initial frequency of 4,
 // initial amplitude of 2, persistence of 0.5
@@ -22,11 +23,11 @@ double n2 = ng.noise(1.0, 1.2, 5.2);
 // Load a map of 256 colors from a file
 FileColorLoader cl(256, "colormap.txt");
 
-// Load RGB string ("R G B") for noise value n2 from above
+// Load RGB Color for noise value n2 from above
 // Keep in mind that we have to map the value from [-1, 1]
 // to 0 - 255
-double height = floor(((n2 * 0.5) + 0.5) * 255);
-std::string color = cl.getColorRGB(height);
+int height = floor(((n2 * 0.5) + 0.5) * 255);
+Color color = cl.getColorRGB(height);
 ```
 
 ```make && ./main``` will spit out a 400x400 colored noise image in the [Netpbm format](https://en.wikipedia.org/wiki/Netpbm).

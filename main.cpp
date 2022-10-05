@@ -10,10 +10,15 @@
 
 int main() {
 
+    std::ofstream img("test.pbm");
+    img << "P3" << std::endl;
+    img << SIZE << " " << SIZE << std::endl;
+    img << "255" << std::endl;
+
+
+    // Noise generation
     NoiseGenerator ng(time(NULL), 24, 2, 2, 0.5);
     ng.setScaling(2, 1);
-
-    FileColorLoader colors(256, "colormap.txt");
 
     std::array<std::array<double, SIZE>, SIZE> arr = {};
     for (int y = 0; y < SIZE; ++y) {
@@ -28,15 +33,14 @@ int main() {
         }
     }
 
-    std::ofstream img("test.pbm");
-    img << "P3" << std::endl;
-    img << SIZE << " " << SIZE << std::endl;
-    img << "255" << std::endl;
+    // Color
+    FileColorLoader colors(256, "colormap.txt");
 
     for (int y = 0; y < SIZE; ++y) {
         for (int x = 0; x < SIZE; ++x) {
-            double height = floor(arr[x][y] * 255);
-            img << colors.getColorRGB(height) << " " <<  std::endl;
+            int height = floor(arr[x][y] * 255);
+            Color color = colors.getColorRGB(height);
+            img << color.r << " " << color.g << " " << color.b << " " <<  std::endl;
         }
         img << std::endl;
     }
