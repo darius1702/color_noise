@@ -75,10 +75,10 @@ double NoiseGenerator::noise(double x, double y, double z) {
         scaled = 1;
     }
 
-    return pow(scaled, m_exponent);
+    return pow((scaled * 0.5) + 0.5, m_exponent);
 }
 
-void NoiseGenerator::setScaling(int factor, int exponent) {
+void NoiseGenerator::setScaling(double factor, double exponent) {
     if (factor < 0  || exponent < 0) {
          throw std::invalid_argument("invalid noise factor/exponent: " + std::to_string(factor) + " / " + std::to_string(exponent));
     }

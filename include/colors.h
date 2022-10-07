@@ -7,27 +7,27 @@
 #include <string>
 #include <exception>
 
-struct Color {
-    int r, g, b;
+struct Color
+{
+  unsigned char r, g, b;
+  unsigned char a = 0xFF;
+  Color(unsigned char r_, unsigned char g_, unsigned char b_, unsigned char a_ = 0xFF)
+    : r(r_)
+    , g(g_)
+    , b(b_)
+    , a(a_){};
 };
 
-class ColorLoader {
+class ColorMap {
 
-    protected:
-        int m_num_colors;
-
-        std::vector<Color> m_colormap;
+    private:
+        std::vector<Color> m_colors;
 
     public:
-        ColorLoader(int num_colors) : m_num_colors (num_colors) {}
+        ColorMap(const std::string& filename);
+        int size();
 
-        virtual Color getColorRGB(int index) = 0;
-};
-
-class FileColorLoader: public ColorLoader {
-    public:
-        FileColorLoader(int num_colors, std::string filename);
-        Color getColorRGB(int index) override;
+        Color getColorStruct(int index);
 };
 
 #endif // !COLORS_H

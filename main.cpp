@@ -17,30 +17,28 @@ int main() {
 
 
     // Noise generation
-    NoiseGenerator ng(time(NULL), 24, 2, 2, 0.5);
-    ng.setScaling(2, 1);
+    NoiseGenerator ng(time(NULL), 6, 2, 2, 0.5);
+    ng.setScaling(1, 1);
 
     std::array<std::array<double, SIZE>, SIZE> arr = {};
     for (int y = 0; y < SIZE; ++y) {
         for (int x = 0; x < SIZE; ++x) {
-            double dx = x * 0.02;
-            double dy = y * 0.02;
+            double dx = x / static_cast<double>(SIZE);
+            double dy = y / static_cast<double>(SIZE);
 
-            double value = ng.noise(dx, dy, 0.0);
+            arr[x][y] = ng.noise(dx, dy, 0.0);
 
-            double height = (value * 0.5) + 0.5;
-            arr[x][y] = height;
         }
     }
 
     // Color
-    FileColorLoader colors(256, "colormap.txt");
+    ColorMap colors("colormap.txt");
 
     for (int y = 0; y < SIZE; ++y) {
         for (int x = 0; x < SIZE; ++x) {
-            int height = floor(arr[x][y] * 255);
-            Color color = colors.getColorRGB(height);
-            img << color.r << " " << color.g << " " << color.b << " " <<  std::endl;
+            int height = round(arr[x][y] * (colors.size() - 1));
+            Color color = colors.getColorStruct(height);
+            img << (int)color.r << " " << (int)color.g << " " << (int)color.b << " " <<  std::endl;
         }
         img << std::endl;
     }

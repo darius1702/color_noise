@@ -20,7 +20,7 @@ class NoiseGenerator {
         double m_persistence;
 
         // Scaling parameters
-        int m_factor, m_exponent;
+        double m_factor, m_exponent;
 
         // Smoothstep fade function
         static double fade(double t);
@@ -31,6 +31,9 @@ class NoiseGenerator {
         // Perlin Noise gradient function
         double grad(int hash, double x, double y, double z);
 
+        // Get single octave noise in [-1 ,1]
+        double simpleNoise(double x, double y, double z);
+
     public:
         NoiseGenerator(
                 int seed,
@@ -39,14 +42,11 @@ class NoiseGenerator {
                 int amplitude,
                 double persistence);
 
-        // Get fractal noise in [-1, 1]
+        // Get fractal noise in [0, 1]
         double noise(double x, double y, double z);
 
-        // Get single octave noise in [-1 ,1]
-        double simpleNoise(double x, double y, double z);
-
         // Set scaling factor end exponent for noise values
-        void setScaling(int factor, int exponent);
+        void setScaling(double factor, double exponent);
 };
 
 #endif // !NOISE_H
