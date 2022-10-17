@@ -17,8 +17,8 @@ ng.setScaling(2, 1.2);
 // the generator was constructed with
 double n = ng.noise(1.0, 1.2, 5.2);
 
-// Load a map of 256 colors from a file
-Colormap cl("colormap.txt");
+// Load a list of colors from a file
+Colormap cl("resources/colormap.txt");
 
 // Load RGB Color for noise value n from above
 // Keep in mind that we have to map the value from [0, 1]
