@@ -7,6 +7,8 @@
 #include <string>
 #include <exception>
 
+#define HEX_PATTERN "#%02x%02x%02x"
+
 struct Color
 {
   unsigned char r, g, b;

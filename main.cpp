@@ -17,7 +17,7 @@ int main() {
 
 
     // Noise generation
-    NoiseGenerator ng(time(NULL), 6, 2, 2, 0.5);
+    NoiseGenerator ng(time(NULL), 8, 4, 4, 0.5);
     ng.setScaling(1, 1);
 
     std::array<std::array<double, SIZE>, SIZE> arr = {};
@@ -27,12 +27,11 @@ int main() {
             double dy = y / static_cast<double>(SIZE);
 
             arr[x][y] = ng.noise(dx, dy, 0.0);
-
         }
     }
 
     // Color
-    ColorMap colors("colormap.txt");
+    ColorMap colors("resources/colormap.txt");
 
     for (int y = 0; y < SIZE; ++y) {
         for (int x = 0; x < SIZE; ++x) {

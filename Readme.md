@@ -29,7 +29,7 @@ Color color = cl.getColorRGB(height);
 
 ```make && ./main``` will spit out a 400x400 colored noise image in the [Netpbm format](https://en.wikipedia.org/wiki/Netpbm).
 
-![example of a generated image](https://github.com/darius1702/color_noise/blob/main/example.png)
+![example of a generated image](https://github.com/darius1702/color_noise/blob/main/resources/example.png)
 ## TODO
 - Color map generation
 - Code cleanup

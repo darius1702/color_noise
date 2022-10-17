@@ -12,9 +12,13 @@ ColorMap::ColorMap(const std::string& filename) {
     while (getline(file, line)) {
 
         unsigned int r, g, b;
-        std::sscanf(line.c_str(), "#%02x%02x%02x", &r, &g, &b);
+        std::sscanf(line.c_str(), HEX_PATTERN, &r, &g, &b);
 
-        m_colors.push_back({static_cast<unsigned char>(r & 0xff), static_cast<unsigned char>(g & 0xff), static_cast<unsigned char>(b & 0xff)});
+        m_colors.push_back({
+                static_cast<unsigned char>(r & 0xff),
+                static_cast<unsigned char>(g & 0xff),
+                static_cast<unsigned char>(b & 0xff)
+                });
     }
 
     file.close();
