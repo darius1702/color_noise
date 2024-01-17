@@ -1,6 +1,8 @@
 .DS_Store
 noise
 main
+.cache/
+compile_commands.json
 *.o
 *.pbm
 *.ppm
